@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>x402 Shop - Crypto Payments</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "Inter", system-ui, -apple-system, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px;
+      }
+      .container {
+        max-width: 1000px;
+        margin: 0 auto;
+      }
+      .header {
+        text-align: center;
+        color: white;
+        margin-bottom: 40px;
+        padding: 20px 0;
+      }
+      .header h1 {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      }
+      .header p {
+        font-size: 1.2rem;
+        opacity: 0.95;
+      }
+      .badge {
+        display: inline-block;
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        background: rgba(255, 255, 255, 0.25);
+        backdrop-filter: blur(10px);
+        margin-top: 10px;
+      }
+      .products-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 24px;
+        margin-bottom: 30px;
+      }
+      .product-card {
+        background: white;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+      .product-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);
+      }
+      .product-icon {
+        font-size: 3rem;
+        margin-bottom: 16px;
+      }
+      .product-name {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: #1a202c;
+        margin-bottom: 8px;
+      }
+      .product-price {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #667eea;
+        margin-bottom: 16px;
+      }
+      .qty-control {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 12px;
+      }
+      .qty-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        border: 2px solid #667eea;
+        background: white;
+        color: #667eea;
+        font-size: 1.2rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .qty-btn:hover {
+        background: #667eea;
+        color: white;
+      }
+      .qty-input {
+        width: 60px;
+        text-align: center;
+        font-size: 1.1rem;
+        font-weight: 600;
+        padding: 8px;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+      }
+      .line-total {
+        text-align: right;
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #2d3748;
+      }
+      .cart-summary {
+        background: white;
+        border-radius: 16px;
+        padding: 32px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+      }
+      .total-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #e2e8f0;
+      }
+      .total-label {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1a202c;
+      }
+      .total-amount {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #667eea;
+      }
+      .checkout-btn {
+        width: 100%;
+        padding: 18px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        font-size: 1.2rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+        box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+      }
+      .checkout-btn:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 30px rgba(102, 126, 234, 0.6);
+      }
+      .checkout-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>🛒 x402 Shop</h1>
+        <p>Pay with crypto in seconds</p>
+        <span class="badge">🔐 Secure • ⚡ Instant • 💎 On-Chain</span>
+      </div>
+
+      <!-- Network & Token Selector -->
+      <div style="text-align: center; margin-bottom: 25px; padding: 20px; background: rgba(255,255,255,0.15); border-radius: 16px; backdrop-filter: blur(10px); display: flex; gap: 30px; justify-content: center; align-items: center; flex-wrap: wrap;">
+        <div>
+          <label style="color: white; font-weight: 600; margin-right: 12px; font-size: 1.1rem;">Network:</label>
+          <select id="network-selector" style="padding: 10px 20px; border-radius: 10px; border: 2px solid white; font-weight: 600; font-size: 1rem; background: white; color: #667eea; cursor: pointer;">
+            <option value="filecoin-calibration">🌐 Filecoin Calibration</option>
+            <option value="sepolia">🌐 Sepolia</option>
+          </select>
+        </div>
+        <div>
+          <label style="color: white; font-weight: 600; margin-right: 12px; font-size: 1.1rem;">Token:</label>
+          <select id="token-selector" style="padding: 10px 20px; border-radius: 10px; border: 2px solid white; font-weight: 600; font-size: 1rem; background: white; color: #667eea; cursor: pointer;">
+            <option value="">All Available</option>
+            <option value="USDC">USDC 💵</option>
+            <option value="JPYC">JPYC 💴</option>
+            <option value="USDFC">USDFC 💰</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Wallet connection -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+        <div>
+          <span id="network-status" style="color: white; font-weight: 600">⛓ Not connected</span>
+        </div>
+        <button id="connect-wallet" style="padding: 10px 18px; border-radius: 10px; border: none; background: white; color: #667eea; font-weight: 600; cursor: pointer;">🔌 Connect Wallet</button>
+      </div>
+
+      <div id="catalog" class="products-grid"></div>
+
+      <div class="cart-summary">
+        <div class="total-section">
+          <div>
+            <span class="total-label">Total</span>
+            <div style="font-size: 0.95rem; color: #718096">Pay in: <b id="pay-token">USDFC 💰</b></div>
+          </div>
+          <span class="total-amount" id="total">$0.00</span>
+        </div>
+        <button id="checkout" class="checkout-btn" disabled>🔒 Secure Checkout</button>
+      </div>
+    </div>
+
+    <script>
+      const NETWORKS = {
+        "filecoin-calibration": {
+          chainId: "0x4cb2f",
+          chainName: "Filecoin Calibration Testnet",
+          nativeCurrency: { name: "tFIL", symbol: "tFIL", decimals: 18 },
+          rpcUrls: ["https://api.calibration.node.glif.io/rpc/v1"],
+          blockExplorerUrls: ["https://calibration.filfox.info/en"],
+          token: "USDFC 💰",
+          displayName: "Filecoin Calibration",
+        },
+        "sepolia": {
+          chainId: "0xaa36a7",
+          chainName: "Sepolia Testnet",
+          nativeCurrency: { name: "ETH", symbol: "ETH", decimals: 18 },
+          rpcUrls: ["https://ethereum-sepolia-rpc.publicnode.com"],
+          blockExplorerUrls: ["https://sepolia.etherscan.io"],
+          token: "USDC 💵",
+          displayName: "Sepolia",
+        },
+      };
+
+      let selectedNetwork = "filecoin-calibration";
+      let selectedToken = ""; // Empty means "all available tokens"
+      let userAddress = null;
+
+      async function ensureCorrectChain() {
+        const network = NETWORKS[selectedNetwork];
+        if (!window.ethereum) throw new Error("MetaMask not detected");
+        try {
+          await window.ethereum.request({
+            method: "wallet_switchEthereumChain",
+            params: [{ chainId: network.chainId }],
+          });
+        } catch (err) {
+          if (err.code === 4902) {
+            await window.ethereum.request({
+              method: "wallet_addEthereumChain",
+              params: [network],
+            });
+          } else {
+            throw err;
+          }
+        }
+      }
+
+      async function connectWallet() {
+        const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+        userAddress = accounts[0];
+        await ensureCorrectChain();
+        updateWalletUI();
+      }
+
+      function shortAddr(a) {
+        return a ? `${a.slice(0, 6)}...${a.slice(-4)}` : "";
+      }
+
+      function updateWalletUI() {
+        const connectBtn = document.getElementById("connect-wallet");
+        const netStatus = document.getElementById("network-status");
+        const network = NETWORKS[selectedNetwork];
+        if (userAddress) {
+          connectBtn.textContent = shortAddr(userAddress);
+          connectBtn.style.background = "#667eea";
+          connectBtn.style.color = "white";
+          netStatus.textContent = `🌐 ${network.displayName}`;
+          netStatus.style.color = "#C6F6D5";
+        }
+      }
+
+      async function fetchProducts() {
+        const res = await fetch("/products");
+        return await res.json();
+      }
+
+      (async function init() {
+        const data = await fetchProducts();
+        const catalog = document.getElementById("catalog");
+        const totalEl = document.getElementById("total");
+        const checkoutBtn = document.getElementById("checkout");
+        const connectBtn = document.getElementById("connect-wallet");
+        const networkSelector = document.getElementById("network-selector");
+        const tokenSelector = document.getElementById("token-selector");
+        const payTokenEl = document.getElementById("pay-token");
+
+        connectBtn.addEventListener("click", connectWallet);
+
+        networkSelector.addEventListener("change", e => {
+          selectedNetwork = e.target.value;
+          payTokenEl.textContent = NETWORKS[selectedNetwork].token;
+          updateWalletUI();
+        });
+
+        tokenSelector.addEventListener("change", e => {
+          selectedToken = e.target.value;
+          // Update display if specific token selected
+          if (selectedToken) {
+            payTokenEl.textContent = `${selectedToken} ${selectedToken === 'USDC' ? '💵' : selectedToken === 'JPYC' ? '💴' : '💰'}`;
+          } else {
+            payTokenEl.textContent = NETWORKS[selectedNetwork].token;
+          }
+        });
+
+        const products = data.products;
+        const state = products.map(p => ({ ...p, qty: 0 }));
+
+        function render() {
+          catalog.innerHTML = "";
+          state.forEach((s, idx) => {
+            const div = document.createElement("div");
+            div.className = "product-card";
+            div.innerHTML = `
+              <div class="product-icon">${["🎨", "👕", "☕"][idx] || "📦"}</div>
+              <div class="product-name">${s.name}</div>
+              <div class="product-price">$${s.priceUSD}</div>
+              <div class="qty-control">
+                <button class="qty-btn" data-idx="${idx}" data-action="dec">−</button>
+                <input class="qty-input" type="number" value="${s.qty}" readonly />
+                <button class="qty-btn" data-idx="${idx}" data-action="inc">+</button>
+              </div>
+              <div class="line-total">$${(s.qty * s.priceUSD).toFixed(2)}</div>`;
+            catalog.appendChild(div);
+          });
+
+          const total = state.reduce((acc, s) => acc + s.qty * s.priceUSD, 0);
+          totalEl.textContent = "$" + total.toFixed(2);
+          checkoutBtn.disabled = total <= 0 || !userAddress;
+        }
+
+        catalog.addEventListener("click", e => {
+          const btn = e.target.closest(".qty-btn");
+          if (!btn) return;
+          const idx = Number(btn.getAttribute("data-idx"));
+          const action = btn.getAttribute("data-action");
+          if (action === "inc") state[idx].qty++;
+          else if (action === "dec" && state[idx].qty > 0) state[idx].qty--;
+          render();
+        });
+
+        checkoutBtn.addEventListener("click", async () => {
+          try {
+            checkoutBtn.disabled = true;
+            checkoutBtn.textContent = "Processing...";
+            await ensureCorrectChain();
+            const items = state.filter(s => s.qty > 0);
+            // Pass selected network and token to backend
+            let url = `/checkout-page?items=${encodeURIComponent(JSON.stringify(items))}&network=${selectedNetwork}`;
+            if (selectedToken) {
+              url += `&token=${selectedToken}`;
+            }
+            window.location.href = url;
+          } catch (err) {
+            console.error("Checkout error:", err);
+            alert("Network or RPC issue. Please retry.");
+          } finally {
+            checkoutBtn.disabled = false;
+            checkoutBtn.textContent = "🔒 Secure Checkout";
+          }
+        });
+
+        render();
+      })();
+    </script>
+  </body>
+</html>
