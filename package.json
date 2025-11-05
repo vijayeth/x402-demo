@@ -4,7 +4,9 @@
   "private": true,
   "description": "Standalone ecommerce demo using published x402 packages",
   "scripts": {
-    "dev": "tsx ecom.ts"
+    "dev": "tsx ecom.ts",
+    "build": "tsc",
+    "start": "node dist/ecom.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
