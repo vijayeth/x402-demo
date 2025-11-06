@@ -227,6 +227,7 @@
           blockExplorerUrls: ["https://calibration.filfox.info/en"],
           token: "USDFC 💰",
           displayName: "Filecoin Calibration",
+          availableTokens: ["USDFC"],
         },
         "sepolia": {
           chainId: "0xaa36a7",
@@ -236,12 +237,37 @@
           blockExplorerUrls: ["https://sepolia.etherscan.io"],
           token: "USDC 💵",
           displayName: "Sepolia",
+          availableTokens: ["USDC", "JPYC"],
         },
       };
 
       let selectedNetwork = "filecoin-calibration";
       let selectedToken = ""; // Empty means "all available tokens"
       let userAddress = null;
+
+      function updateTokenSelector() {
+        const tokenSelector = document.getElementById("token-selector");
+        const network = NETWORKS[selectedNetwork];
+        const availableTokens = network.availableTokens || [];
+
+        // Clear existing options
+        tokenSelector.innerHTML = "";
+
+        // Add available tokens for the selected network
+        availableTokens.forEach(token => {
+          const option = document.createElement("option");
+          option.value = token;
+          const emoji = token === 'USDC' ? '💵' : token === 'JPYC' ? '💴' : '💰';
+          option.textContent = `${token} ${emoji}`;
+          tokenSelector.appendChild(option);
+        });
+
+        // Set the first token as selected
+        if (availableTokens.length > 0) {
+          selectedToken = availableTokens[0];
+          tokenSelector.value = selectedToken;
+        }
+      }
 
       async function ensureCorrectChain() {
         const network = NETWORKS[selectedNetwork];
@@ -306,7 +332,9 @@
 
         networkSelector.addEventListener("change", e => {
           selectedNetwork = e.target.value;
-          payTokenEl.textContent = NETWORKS[selectedNetwork].token;
+          updateTokenSelector();
+          const emoji = selectedToken === 'USDC' ? '💵' : selectedToken === 'JPYC' ? '💴' : '💰';
+          payTokenEl.textContent = `${selectedToken} ${emoji}`;
           updateWalletUI();
         });
 
@@ -314,11 +342,15 @@
           selectedToken = e.target.value;
           // Update display if specific token selected
           if (selectedToken) {
-            payTokenEl.textContent = `${selectedToken} ${selectedToken === 'USDC' ? '💵' : selectedToken === 'JPYC' ? '💴' : '💰'}`;
-          } else {
-            payTokenEl.textContent = NETWORKS[selectedNetwork].token;
+            const emoji = selectedToken === 'USDC' ? '💵' : selectedToken === 'JPYC' ? '💴' : '💰';
+            payTokenEl.textContent = `${selectedToken} ${emoji}`;
           }
         });
+
+        // Initialize token selector based on default network
+        updateTokenSelector();
+        const emoji = selectedToken === 'USDC' ? '💵' : selectedToken === 'JPYC' ? '💴' : '💰';
+        payTokenEl.textContent = `${selectedToken} ${emoji}`;
 
         const products = data.products;
         const state = products.map(p => ({ ...p, qty: 0 }));
