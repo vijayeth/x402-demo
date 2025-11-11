@@ -257,7 +257,7 @@
         availableTokens.forEach(token => {
           const option = document.createElement("option");
           option.value = token;
-          const emoji = token === 'USDC' ? '💵' : token === 'JPYC' ? '💴' : '💰';
+          const emoji = token === 'USDC' ? '💵' : token === 'JPY Coin' ? '💴' : '💰';
           option.textContent = `${token} ${emoji}`;
           tokenSelector.appendChild(option);
         });

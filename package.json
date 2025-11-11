@@ -1,6 +1,7 @@
 {
   "name": "ecom-standalone-demo",
   "version": "1.0.0",
+  "type": "module",
   "private": true,
   "description": "Standalone ecommerce demo using published x402 packages",
   "scripts": {
@@ -9,11 +10,11 @@
     "start": "node dist/ecom.js"
   },
   "dependencies": {
+    "@secured-finance/sf-x402": "^0.0.1",
+    "@secured-finance/sf-x402-express": "^0.0.2",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
-    "express": "^4.18.2",
-    "x402-payments": "^0.0.4",
-    "x402-v": "^0.0.1"
+    "express": "^4.18.2"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
