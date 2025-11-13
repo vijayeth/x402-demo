@@ -11,7 +11,7 @@ import {
 
 config();
 
-const FACILITATOR_URL = "http://localhost:3002" as Resource;
+const FACILITATOR_URL = (process.env.FACILITATOR_URL || "http://localhost:3002") as Resource;
 const PAY_TO = (process.env.ADDRESS ||
   "0x0000000000000000000000000000000000000000") as `0x${string}`;
 const NETWORK = (process.env.NETWORK || "filecoin-calibration") as Network;
