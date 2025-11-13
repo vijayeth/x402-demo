@@ -219,8 +219,6 @@ app.get(
   },
   (req, res) => {
     // This runs after payment is verified
-    const cartInfo = (req as any).cartInfo;
-
     res.send(`
       <!DOCTYPE html>
       <html>
@@ -281,10 +279,5 @@ app.get("/weather", (req, res) => {
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`\n🛒 x402 Demo Shop (LIVE Payments)`);
-  console.log(`Server: http://localhost:${PORT}`);
-  console.log(`Network: ${NETWORK}`);
-  console.log(`Facilitator: ${FACILITATOR_URL}`);
-  console.log(`PayTo Address: ${PAY_TO}\n`);
-});
+// Export for Vercel serverless
+export default app;
