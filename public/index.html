@@ -188,7 +188,6 @@
           <label style="color: white; font-weight: 600; margin-right: 12px; font-size: 1.1rem;">Token:</label>
           <select id="token-selector" style="padding: 10px 20px; border-radius: 10px; border: 2px solid white; font-weight: 600; font-size: 1rem; background: white; color: #667eea; cursor: pointer;">
             <option value="">All Available</option>
-            <option value="USDC">USDC 💵</option>
             <option value="JPYC">JPYC 💴</option>
             <option value="USDFC">USDFC 💰</option>
           </select>
@@ -235,9 +234,9 @@
           nativeCurrency: { name: "ETH", symbol: "ETH", decimals: 18 },
           rpcUrls: ["https://ethereum-sepolia-rpc.publicnode.com"],
           blockExplorerUrls: ["https://sepolia.etherscan.io"],
-          token: "USDC 💵",
+          token: "JPYC 💴",
           displayName: "Sepolia",
-          availableTokens: ["USDC", "JPYC"],
+          availableTokens: ["JPYC"],
         },
       };
 
@@ -257,7 +256,7 @@
         availableTokens.forEach(token => {
           const option = document.createElement("option");
           option.value = token;
-          const emoji = token === 'USDC' ? '💵' : token === 'JPY Coin' ? '💴' : '💰';
+          const emoji = token === 'JPYC' ? '💴' : '💰';
           option.textContent = `${token} ${emoji}`;
           tokenSelector.appendChild(option);
         });
@@ -333,7 +332,7 @@
         networkSelector.addEventListener("change", e => {
           selectedNetwork = e.target.value;
           updateTokenSelector();
-          const emoji = selectedToken === 'USDC' ? '💵' : selectedToken === 'JPYC' ? '💴' : '💰';
+          const emoji = selectedToken === 'JPYC' ? '💴' : '💰';
           payTokenEl.textContent = `${selectedToken} ${emoji}`;
           updateWalletUI();
         });
@@ -342,14 +341,14 @@
           selectedToken = e.target.value;
           // Update display if specific token selected
           if (selectedToken) {
-            const emoji = selectedToken === 'USDC' ? '💵' : selectedToken === 'JPYC' ? '💴' : '💰';
+            const emoji = selectedToken === 'JPYC' ? '💴' : '💰';
             payTokenEl.textContent = `${selectedToken} ${emoji}`;
           }
         });
 
         // Initialize token selector based on default network
         updateTokenSelector();
-        const emoji = selectedToken === 'USDC' ? '💵' : selectedToken === 'JPYC' ? '💴' : '💰';
+        const emoji = selectedToken === 'JPYC' ? '💴' : '💰';
         payTokenEl.textContent = `${selectedToken} ${emoji}`;
 
         const products = data.products;
@@ -392,7 +391,7 @@
           try {
             checkoutBtn.disabled = true;
             checkoutBtn.textContent = "Processing...";
-            await ensureCorrectChain();
+            // Removed ensureCorrectChain() - let x402 paywall handle chain switching
             const items = state.filter(s => s.qty > 0);
             // Pass selected network and token to backend
             let url = `/checkout-page?items=${encodeURIComponent(JSON.stringify(items))}&network=${selectedNetwork}`;
