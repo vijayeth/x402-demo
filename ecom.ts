@@ -73,6 +73,23 @@ const PRODUCTS = [
   { id: "p3", name: "Gamma Mug", priceUSD: 1.25 },
 ];
 
+// Exchange rates: how many tokens per $1 USD
+// 1 JPYC = $0.007066 USD → 1 / 0.007066 = ~141.5 JPYC per $1
+// 1 USDFC = $0.9872 USD → 1 / 0.9872 = ~1.013 USDFC per $1
+const EXCHANGE_RATES: Record<string, { rate: number; token: string }> = {
+  "filecoin-calibration": { rate: 1.013, token: "USDFC" },
+  sepolia: { rate: 141.5, token: "JPYC" },
+};
+
+// Helper: Convert USD to network token amount
+function convertToNetworkPrice(usdAmount: number, network: string): string {
+  const config = EXCHANGE_RATES[network] || EXCHANGE_RATES["filecoin-calibration"];
+  const amount = usdAmount * config.rate;
+  // Show 2 decimal places for all tokens
+  const formatted = amount.toFixed(2);
+  return `${formatted} ${config.token}`;
+}
+
 // Helper: Calculate cart totals from items array
 function calculateCart(items: Array<{ id: string; qty: number }>) {
   let subtotal = 0;
@@ -182,12 +199,15 @@ app.post(
 
     (req as any).cartInfo = { subtotal, lineItems };
 
+    // Calculate price in network token (e.g., 15 JPYC for $0.10 on Sepolia)
+    const networkPrice = convertToNetworkPrice(subtotal, selectedNetwork);
+
     // Apply x402 middleware with dynamic price, network, and optional token
     const middleware = paymentMiddleware(
       PAY_TO,
       {
         "POST /checkout": {
-          price: `$${subtotal}`,
+          price: networkPrice,
           network: selectedNetwork as any,
           ...(selectedToken && { token: selectedToken as any }),
         },
@@ -261,12 +281,15 @@ app.get(
 
     (req as any).cartInfo = { subtotal, lineItems };
 
+    // Calculate price in network token (e.g., 15 JPYC for $0.10 on Sepolia)
+    const networkPrice = convertToNetworkPrice(subtotal, selectedNetwork as string);
+
     // Apply x402 middleware with dynamic price, network, and optional token
     const middleware = paymentMiddleware(
       PAY_TO,
       {
         "GET /checkout-page": {
-          price: `$${subtotal}`,
+          price: networkPrice,
           network: selectedNetwork as any,
           ...(selectedToken && { token: selectedToken as any }),
         },
@@ -636,12 +659,15 @@ app.get(
     const selectedNetwork = (req.query.network as string) || NETWORK;
     const selectedToken = req.query.token as string;
 
+    // Calculate price in network token
+    const networkPrice = convertToNetworkPrice(content.priceUSD, selectedNetwork);
+
     // Apply x402 middleware with content price
     const middleware = paymentMiddleware(
       PAY_TO,
       {
         [`GET /ppv/${contentId}`]: {
-          price: `$${content.priceUSD}`,
+          price: networkPrice,
           network: selectedNetwork as any,
           ...(selectedToken && { token: selectedToken as any }),
         },
@@ -741,7 +767,7 @@ app.get("/weather", (_req, res) => {
 // Helper to create dynamic payment middleware for API endpoints
 function createPaidApiRoute(
   path: string,
-  price: string,
+  priceUSD: number,
   handler: (req: express.Request, res: express.Response) => void
 ) {
   app.get(
@@ -750,11 +776,14 @@ function createPaidApiRoute(
       const selectedNetwork = (req.query.network as string) || NETWORK;
       const selectedToken = req.query.token as string;
 
+      // Calculate price in network token
+      const networkPrice = convertToNetworkPrice(priceUSD, selectedNetwork);
+
       const middleware = paymentMiddleware(
         PAY_TO,
         {
           [`GET ${path}`]: {
-            price,
+            price: networkPrice,
             network: selectedNetwork as any,
             ...(selectedToken && { token: selectedToken as any }),
           },
@@ -769,7 +798,7 @@ function createPaidApiRoute(
 }
 
 // GET /api/premium/weather - Detailed weather data ($0.01)
-createPaidApiRoute("/api/premium/weather", "$0.01", (_req, res) => {
+createPaidApiRoute("/api/premium/weather", 0.01, (_req, res) => {
   res.json({
     premium: true,
     location: "San Francisco, CA",
@@ -791,7 +820,7 @@ createPaidApiRoute("/api/premium/weather", "$0.01", (_req, res) => {
 });
 
 // GET /api/premium/market - Market data ($0.05)
-createPaidApiRoute("/api/premium/market", "$0.05", (_req, res) => {
+createPaidApiRoute("/api/premium/market", 0.05, (_req, res) => {
   res.json({
     premium: true,
     timestamp: new Date().toISOString(),
@@ -806,7 +835,7 @@ createPaidApiRoute("/api/premium/market", "$0.05", (_req, res) => {
 });
 
 // GET /api/premium/ai - AI-generated content ($0.10)
-createPaidApiRoute("/api/premium/ai", "$0.10", (req, res) => {
+createPaidApiRoute("/api/premium/ai", 0.10, (req, res) => {
   const prompt = req.query.prompt || "Hello";
   res.json({
     premium: true,

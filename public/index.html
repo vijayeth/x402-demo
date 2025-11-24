@@ -446,9 +446,12 @@
         </div>
         <div class="control-group">
           <label>Token:</label>
-          <select id="token-selector" class="control-select">
-            <option value="USDFC">USDFC</option>
-          </select>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <img id="token-icon" src="/usdfc.svg" alt="" style="width: 20px; height: 20px;" />
+            <select id="token-selector" class="control-select">
+              <option value="USDFC">USDFC</option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -472,7 +475,9 @@
           <div class="total-section">
             <div>
               <span class="total-label">Total</span>
-              <div style="font-size: 0.95rem; color: #718096">Pay in: <b id="pay-token">USDFC</b></div>
+              <div style="font-size: 0.95rem; color: #718096; display: flex; align-items: center; gap: 4px;">
+                Pay in: <img id="pay-token-icon" src="/usdfc.svg" alt="" style="width: 16px; height: 16px;" /> <b id="pay-token">USDFC</b>
+              </div>
             </div>
             <span class="total-amount" id="total">0.00</span>
           </div>
@@ -524,10 +529,10 @@
               <option value="weather">GET /weather - Basic Weather</option>
               <option value="ppv-list">GET /api/ppv - PPV Content List</option>
             </optgroup>
-            <optgroup label="Paid Endpoints (x402)">
-              <option value="premium-weather">GET /api/premium/weather - $0.01</option>
-              <option value="premium-market">GET /api/premium/market - $0.05</option>
-              <option value="premium-ai">GET /api/premium/ai - $0.10</option>
+            <optgroup label="Paid Endpoints (x402)" id="paid-endpoints-group">
+              <option value="premium-weather" data-price-usd="0.01">GET /api/premium/weather - $0.01</option>
+              <option value="premium-market" data-price-usd="0.05">GET /api/premium/market - $0.05</option>
+              <option value="premium-ai" data-price-usd="0.10">GET /api/premium/ai - $0.10</option>
             </optgroup>
           </select>
           <button id="api-call-btn" class="api-btn">Send Request</button>
@@ -548,7 +553,7 @@
           blockExplorerUrls: ["https://calibration.filfox.info/en"],
           displayName: "Filecoin Calibration",
           availableTokens: ["USDFC"],
-          exchangeRate: 1,
+          exchangeRate: 1.013, // 1 USDFC = $0.9872 USD
         },
         sepolia: {
           chainId: "0xaa36a7",
@@ -558,7 +563,7 @@
           blockExplorerUrls: ["https://sepolia.etherscan.io"],
           displayName: "Sepolia",
           availableTokens: ["JPYC"],
-          exchangeRate: 150,
+          exchangeRate: 141.5, // 1 JPYC = $0.007066 USD
         },
       };
 
@@ -587,7 +592,7 @@
       // ========== HELPERS ==========
       function convertPrice(usdPrice, network) {
         const rate = NETWORKS[network].exchangeRate;
-        return (usdPrice * rate).toFixed(rate >= 10 ? 0 : 2);
+        return (usdPrice * rate).toFixed(2);
       }
 
       function getTokenDisplay(network) {
@@ -776,6 +781,8 @@
         const checkoutBtn = document.getElementById("checkout");
         const payTokenEl = document.getElementById("pay-token");
         const token = getTokenDisplay(selectedNetwork);
+        const iconUrl = getTokenIconUrl(token);
+        const iconHtml = `<img src="${iconUrl}" alt="${token}" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 2px;">`;
 
         catalog.innerHTML = "";
         cartState.forEach((s, idx) => {
@@ -787,19 +794,19 @@
           div.innerHTML = `
             <div class="product-icon">${["🎨", "👕", "☕"][idx] || "📦"}</div>
             <div class="product-name">${s.name}</div>
-            <div class="product-price">${convertedPrice} ${token}</div>
+            <div class="product-price">${iconHtml}${convertedPrice} ${token}</div>
             <div class="qty-control">
               <button class="qty-btn" data-idx="${idx}" data-action="dec">−</button>
               <input class="qty-input" type="number" value="${s.qty}" readonly />
               <button class="qty-btn" data-idx="${idx}" data-action="inc">+</button>
             </div>
-            <div class="line-total">${lineTotal} ${token}</div>`;
+            <div class="line-total">${iconHtml}${lineTotal} ${token}</div>`;
           catalog.appendChild(div);
         });
 
         const totalUSD = cartState.reduce((acc, s) => acc + s.qty * s.priceUSD, 0);
         const convertedTotal = convertPrice(totalUSD, selectedNetwork);
-        totalEl.textContent = `${convertedTotal} ${token}`;
+        totalEl.textContent = convertedTotal;
         payTokenEl.textContent = token;
         checkoutBtn.disabled = totalUSD <= 0 || !userAddress;
       }
@@ -831,10 +838,12 @@
 
       function updatePPVPrices() {
         const token = getTokenDisplay(selectedNetwork);
-        document.getElementById("ppv-song-price").textContent =
-          `${convertPrice(PPV_CONTENT.song.priceUSD, selectedNetwork)} ${token}`;
-        document.getElementById("ppv-video-price").textContent =
-          `${convertPrice(PPV_CONTENT.video.priceUSD, selectedNetwork)} ${token}`;
+        const iconUrl = getTokenIconUrl(token);
+        const iconHtml = `<img src="${iconUrl}" alt="${token}" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 2px;">`;
+        document.getElementById("ppv-song-price").innerHTML =
+          `${iconHtml}${convertPrice(PPV_CONTENT.song.priceUSD, selectedNetwork)} ${token}`;
+        document.getElementById("ppv-video-price").innerHTML =
+          `${iconHtml}${convertPrice(PPV_CONTENT.video.priceUSD, selectedNetwork)} ${token}`;
       }
 
       function updatePPVButtons() {
@@ -862,10 +871,23 @@
         weather: { url: "/weather", paid: false },
         "ppv-list": { url: "/api/ppv", paid: false },
         // Paid endpoints
-        "premium-weather": { url: "/api/premium/weather", paid: true, price: 0.01 },
-        "premium-market": { url: "/api/premium/market", paid: true, price: 0.05 },
-        "premium-ai": { url: "/api/premium/ai", paid: true, price: 0.10 },
+        "premium-weather": { url: "/api/premium/weather", paid: true, price: 0.01, label: "GET /api/premium/weather" },
+        "premium-market": { url: "/api/premium/market", paid: true, price: 0.05, label: "GET /api/premium/market" },
+        "premium-ai": { url: "/api/premium/ai", paid: true, price: 0.10, label: "GET /api/premium/ai" },
       };
+
+      function updateAPIPrices() {
+        const token = getTokenDisplay(selectedNetwork);
+        Object.entries(API_ENDPOINTS).forEach(([key, ep]) => {
+          if (ep.paid) {
+            const option = document.querySelector(`option[value="${key}"]`);
+            if (option) {
+              const price = convertPrice(ep.price, selectedNetwork);
+              option.textContent = `${ep.label} - ${price} ${token}`;
+            }
+          }
+        });
+      }
 
       function initAPITester() {
         const paymentInfo = document.getElementById("api-payment-info");
@@ -920,6 +942,16 @@
       }
 
       // ========== TOKEN SELECTOR ==========
+      function getTokenIconUrl(token) {
+        return `/${token.toLowerCase()}.svg`;
+      }
+
+      function updateTokenIcon(token) {
+        const iconUrl = getTokenIconUrl(token);
+        document.getElementById("token-icon").src = iconUrl;
+        document.getElementById("pay-token-icon").src = iconUrl;
+      }
+
       function updateTokenSelector() {
         const tokenSelector = document.getElementById("token-selector");
         const network = NETWORKS[selectedNetwork];
@@ -936,6 +968,7 @@
         if (availableTokens.length > 0) {
           selectedToken = availableTokens[0];
           tokenSelector.value = selectedToken;
+          updateTokenIcon(selectedToken);
         }
       }
 
@@ -951,11 +984,13 @@
           updateWalletUI();
           renderCart();
           updatePPVPrices();
+          updateAPIPrices();
           refreshDebugBalances();
         });
 
         document.getElementById("token-selector").addEventListener("change", e => {
           selectedToken = e.target.value;
+          updateTokenIcon(selectedToken);
         });
 
         updateTokenSelector();
@@ -964,6 +999,7 @@
         initPPVEvents();
         initAPITester();
         updatePPVPrices();
+        updateAPIPrices();
         fetchMerchantAddress();
 
       })();
