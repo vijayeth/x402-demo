@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>x402 Shop - Crypto Payments</title>
+    <title>x402 Demo - Crypto Payments</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
@@ -10,41 +10,27 @@
     />
     <script src="https://cdn.ethers.io/lib/ethers-5.7.umd.min.js"></script>
     <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
       body {
-        font-family:
-          "Inter",
-          system-ui,
-          -apple-system,
-          sans-serif;
+        font-family: "Inter", system-ui, -apple-system, sans-serif;
         background: #002133;
         min-height: 100vh;
         padding: 20px;
       }
-      .container {
-        max-width: 1000px;
-        margin: 0 auto;
-      }
+      .container { max-width: 1000px; margin: 0 auto; }
       .header {
         text-align: center;
         color: white;
-        margin-bottom: 40px;
+        margin-bottom: 30px;
         padding: 20px 0;
       }
       .header h1 {
-        font-size: 3rem;
+        font-size: 2.5rem;
         font-weight: 700;
-        margin-bottom: 10px;
+        margin-bottom: 8px;
         text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
       }
-      .header p {
-        font-size: 1.2rem;
-        opacity: 0.95;
-      }
+      .header p { font-size: 1.1rem; opacity: 0.95; }
       .badge {
         display: inline-block;
         padding: 6px 14px;
@@ -55,6 +41,138 @@
         backdrop-filter: blur(10px);
         margin-top: 10px;
       }
+
+      /* Debug Panel */
+      .debug-panel {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        margin-bottom: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+      .debug-panel summary {
+        padding: 12px 16px;
+        color: white;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .debug-panel summary:hover { background: rgba(255, 255, 255, 0.05); border-radius: 12px; }
+      .debug-panel[open] summary { border-bottom: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px 12px 0 0; }
+      .debug-content {
+        padding: 16px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 12px;
+      }
+      .debug-card {
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 10px;
+        padding: 14px;
+      }
+      .debug-card-title {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.6);
+        margin-bottom: 8px;
+        font-weight: 600;
+      }
+      .debug-address {
+        font-family: monospace;
+        font-size: 0.8rem;
+        color: #5162FF;
+        word-break: break-all;
+        margin-bottom: 6px;
+      }
+      .debug-balance {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: white;
+      }
+      .debug-refresh {
+        background: #5162FF;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        margin-top: 12px;
+      }
+      .debug-refresh:hover { background: #4152E0; }
+
+      /* Network & Wallet Section */
+      .controls-section {
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 16px;
+        padding: 20px;
+        margin-bottom: 20px;
+        backdrop-filter: blur(10px);
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      .control-group { display: flex; align-items: center; gap: 10px; }
+      .control-group label { color: white; font-weight: 600; font-size: 0.95rem; }
+      .control-select {
+        padding: 10px 16px;
+        border-radius: 10px;
+        border: 2px solid white;
+        font-weight: 600;
+        font-size: 0.95rem;
+        background: white;
+        color: #5162FF;
+        cursor: pointer;
+      }
+      .wallet-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+      .network-status { color: white; font-weight: 600; }
+      .connect-btn {
+        padding: 10px 18px;
+        border-radius: 10px;
+        border: none;
+        background: white;
+        color: #5162FF;
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      /* Tab Navigation */
+      .tabs-nav {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+      }
+      .tab-btn {
+        padding: 12px 20px;
+        border-radius: 10px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        font-weight: 600;
+        font-size: 0.95rem;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .tab-btn:hover { background: rgba(255, 255, 255, 0.2); }
+      .tab-btn.active {
+        background: #5162FF;
+        border-color: #5162FF;
+        color: white;
+      }
+      .tab-panel { display: none; }
+      .tab-panel.active { display: block; }
+
+      /* Shopping Cart Tab */
       .products-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -66,39 +184,18 @@
         border-radius: 16px;
         padding: 24px;
         box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
-        transition:
-          transform 0.2s,
-          box-shadow 0.2s;
+        transition: transform 0.2s, box-shadow 0.2s;
       }
       .product-card:hover {
         transform: translateY(-5px);
         box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);
       }
-      .product-icon {
-        font-size: 3rem;
-        margin-bottom: 16px;
-      }
-      .product-name {
-        font-size: 1.3rem;
-        font-weight: 600;
-        color: #1a202c;
-        margin-bottom: 8px;
-      }
-      .product-price {
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: #5162FF;
-        margin-bottom: 16px;
-      }
-      .qty-control {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        margin-bottom: 12px;
-      }
+      .product-icon { font-size: 3rem; margin-bottom: 16px; }
+      .product-name { font-size: 1.3rem; font-weight: 600; color: #1a202c; margin-bottom: 8px; }
+      .product-price { font-size: 1.5rem; font-weight: 700; color: #5162FF; margin-bottom: 16px; }
+      .qty-control { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
       .qty-btn {
-        width: 36px;
-        height: 36px;
+        width: 36px; height: 36px;
         border-radius: 8px;
         border: 2px solid #5162FF;
         background: white;
@@ -108,10 +205,7 @@
         cursor: pointer;
         transition: all 0.2s;
       }
-      .qty-btn:hover {
-        background: #5162FF;
-        color: white;
-      }
+      .qty-btn:hover { background: #5162FF; color: white; }
       .qty-input {
         width: 60px;
         text-align: center;
@@ -121,12 +215,7 @@
         border: 2px solid #e2e8f0;
         border-radius: 8px;
       }
-      .line-total {
-        text-align: right;
-        font-size: 1.2rem;
-        font-weight: 600;
-        color: #2d3748;
-      }
+      .line-total { text-align: right; font-size: 1.2rem; font-weight: 600; color: #2d3748; }
       .cart-summary {
         background: white;
         border-radius: 16px;
@@ -141,16 +230,8 @@
         padding-bottom: 20px;
         border-bottom: 2px solid #e2e8f0;
       }
-      .total-label {
-        font-size: 1.5rem;
-        font-weight: 600;
-        color: #1a202c;
-      }
-      .total-amount {
-        font-size: 2rem;
-        font-weight: 700;
-        color: #5162FF;
-      }
+      .total-label { font-size: 1.5rem; font-weight: 600; color: #1a202c; }
+      .total-amount { font-size: 2rem; font-weight: 700; color: #5162FF; }
       .checkout-btn {
         width: 100%;
         padding: 18px;
@@ -161,53 +242,108 @@
         font-size: 1.2rem;
         font-weight: 600;
         cursor: pointer;
-        transition:
-          transform 0.2s,
-          box-shadow 0.2s;
+        transition: transform 0.2s, box-shadow 0.2s;
         box-shadow: 0 4px 20px rgba(81, 98, 255, 0.4);
       }
       .checkout-btn:hover:not(:disabled) {
         transform: translateY(-2px);
         box-shadow: 0 6px 30px rgba(81, 98, 255, 0.6);
       }
-      .checkout-btn:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
+      .checkout-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+      /* PPV Tab */
+      .ppv-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 24px;
       }
-      .tx-info {
-        margin-top: 20px;
+      .ppv-card {
         background: white;
-        border-radius: 12px;
-        padding: 20px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
       }
-      .tx-info-title {
+      .ppv-preview {
+        height: 180px;
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+      }
+      .ppv-preview.unlocked { height: auto; min-height: 200px; }
+      .ppv-lock-icon { font-size: 4rem; opacity: 0.5; }
+      .ppv-content { padding: 20px; }
+      .ppv-title { font-size: 1.2rem; font-weight: 700; color: #1a202c; margin-bottom: 8px; }
+      .ppv-desc { font-size: 0.9rem; color: #718096; margin-bottom: 16px; }
+      .ppv-price { font-size: 1.3rem; font-weight: 700; color: #5162FF; margin-bottom: 16px; }
+      .ppv-unlock-btn {
+        width: 100%;
+        padding: 14px;
+        border-radius: 10px;
+        background: #5162FF;
+        color: white;
+        border: none;
         font-size: 1rem;
         font-weight: 600;
-        color: #5162FF;
-        margin-bottom: 12px;
+        cursor: pointer;
+        transition: background 0.2s;
       }
-      .tx-hash-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 12px;
-      }
-      .tx-label {
+      .ppv-unlock-btn:hover:not(:disabled) { background: #4152E0; }
+      .ppv-unlock-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+      .ppv-unlocked-msg {
+        text-align: center;
+        padding: 12px;
+        background: #C6F6D5;
+        color: #276749;
         font-weight: 600;
-        color: #4a5568;
-        flex-shrink: 0;
+        font-size: 0.9rem;
       }
-      .tx-hash {
+
+      /* API Tab */
+      .api-section {
+        background: white;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+      }
+      .api-title { font-size: 1.3rem; font-weight: 700; color: #1a202c; margin-bottom: 16px; }
+      .api-endpoint-select {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        font-size: 1rem;
+        margin-bottom: 16px;
+      }
+      .api-result {
+        background: #1a202c;
+        border-radius: 10px;
+        padding: 16px;
         font-family: monospace;
         font-size: 0.85rem;
-        color: #5162FF;
+        color: #68D391;
+        overflow-x: auto;
+        max-height: 400px;
+        overflow-y: auto;
+        white-space: pre-wrap;
         word-break: break-all;
-        text-decoration: none;
       }
-      .tx-hash:hover {
-        text-decoration: underline;
+      .api-btn {
+        padding: 12px 24px;
+        border-radius: 10px;
+        background: #5162FF;
+        color: white;
+        border: none;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        margin-bottom: 16px;
       }
+      .api-btn:hover { background: #4152E0; }
+      .api-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+      /* Toast Notifications */
       .toast-container {
         position: fixed;
         bottom: 30px;
@@ -229,57 +365,15 @@
         animation: slideIn 0.3s ease-out;
         position: relative;
       }
-      @keyframes slideIn {
-        from {
-          transform: translateX(400px);
-          opacity: 0;
-        }
-        to {
-          transform: translateX(0);
-          opacity: 1;
-        }
-      }
-      @keyframes slideOut {
-        from {
-          transform: translateX(0);
-          opacity: 1;
-        }
-        to {
-          transform: translateX(400px);
-          opacity: 0;
-        }
-      }
-      .toast.removing {
-        animation: slideOut 0.3s ease-in;
-      }
-      .toast-icon {
-        font-size: 1.8rem;
-        flex-shrink: 0;
-      }
-      .toast-content {
-        flex: 1;
-      }
-      .toast-title {
-        font-weight: 600;
-        font-size: 1.1rem;
-        margin-bottom: 6px;
-        color: #1a202c;
-      }
-      .toast-message {
-        font-size: 0.95rem;
-        color: #4a5568;
-        line-height: 1.5;
-      }
-      .toast-link {
-        color: #5162FF;
-        text-decoration: none;
-        font-weight: 600;
-        display: inline-block;
-        margin-top: 8px;
-      }
-      .toast-link:hover {
-        text-decoration: underline;
-      }
+      @keyframes slideIn { from { transform: translateX(400px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+      @keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(400px); opacity: 0; } }
+      .toast.removing { animation: slideOut 0.3s ease-in; }
+      .toast-icon { font-size: 1.8rem; flex-shrink: 0; }
+      .toast-content { flex: 1; }
+      .toast-title { font-weight: 600; font-size: 1.1rem; margin-bottom: 6px; color: #1a202c; }
+      .toast-message { font-size: 0.95rem; color: #4a5568; line-height: 1.5; }
+      .toast-link { color: #5162FF; text-decoration: none; font-weight: 600; display: inline-block; margin-top: 8px; }
+      .toast-link:hover { text-decoration: underline; }
       .toast-close {
         position: absolute;
         top: 12px;
@@ -292,23 +386,7 @@
         padding: 4px;
         line-height: 1;
       }
-      .toast-close:hover {
-        color: #1a202c;
-      }
-      .toast-retry-btn {
-        margin-top: 12px;
-        padding: 8px 16px;
-        background: #5162FF;
-        color: white;
-        border: none;
-        border-radius: 8px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: background 0.2s;
-      }
-      .toast-retry-btn:hover {
-        background: #4152E0;
-      }
+      .toast-close:hover { color: #1a202c; }
       .spinner {
         display: inline-block;
         width: 16px;
@@ -319,142 +397,148 @@
         animation: spin 1s linear infinite;
         margin-right: 8px;
       }
-      @keyframes spin {
-        0% {
-          transform: rotate(0deg);
-        }
-        100% {
-          transform: rotate(360deg);
-        }
-      }
+      @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
   </head>
   <body>
-    <!-- Toast Notification Container -->
     <div id="toast-container" class="toast-container"></div>
 
     <div class="container">
       <div class="header">
-        <h1>🛒 x402 Shop</h1>
-        <p>Pay with crypto in seconds</p>
-        <span class="badge">🔐 Secure • ⚡ Instant • 💎 On-Chain</span>
+        <h1>x402 Demo</h1>
+        <p>HTTP 402 Payments Made Simple</p>
+        <span class="badge">Secure  •  Instant  •  On-Chain</span>
       </div>
 
-      <!-- Network & Token Selector -->
-      <div
-        style="
-          text-align: center;
-          margin-bottom: 25px;
-          padding: 20px;
-          background: rgba(255, 255, 255, 0.15);
-          border-radius: 16px;
-          backdrop-filter: blur(10px);
-          display: flex;
-          gap: 30px;
-          justify-content: center;
-          align-items: center;
-          flex-wrap: wrap;
-        "
-      >
-        <div>
-          <label style="color: white; font-weight: 600; margin-right: 12px; font-size: 1.1rem"
-            >Network:</label
-          >
-          <select
-            id="network-selector"
-            style="
-              padding: 10px 20px;
-              border-radius: 10px;
-              border: 2px solid white;
-              font-weight: 600;
-              font-size: 1rem;
-              background: white;
-              color: #5162FF;
-              cursor: pointer;
-            "
-          >
-            <option value="filecoin-calibration">🌐 Filecoin Calibration</option>
-            <option value="sepolia">🌐 Sepolia</option>
+      <!-- Debug Panel -->
+      <details class="debug-panel" id="debug-panel">
+        <summary>Debug Info</summary>
+        <div class="debug-content">
+          <div class="debug-card">
+            <div class="debug-card-title">Merchant EOA</div>
+            <div class="debug-address" id="debug-merchant-addr">Loading...</div>
+            <div class="debug-balance" id="debug-merchant-bal">- -</div>
+          </div>
+          <div class="debug-card">
+            <div class="debug-card-title">FaciFeeReceiver</div>
+            <div class="debug-address" id="debug-fee-addr">Loading...</div>
+            <div class="debug-balance" id="debug-fee-bal">- -</div>
+          </div>
+          <div class="debug-card">
+            <div class="debug-card-title">My Wallet</div>
+            <div class="debug-address" id="debug-my-addr">Not connected</div>
+            <div class="debug-balance" id="debug-my-bal">- -</div>
+          </div>
+        </div>
+        <div style="padding: 0 16px 16px;">
+          <button class="debug-refresh" onclick="refreshDebugBalances()">Refresh Balances</button>
+        </div>
+      </details>
+
+      <!-- Network & Token Controls -->
+      <div class="controls-section">
+        <div class="control-group">
+          <label>Network:</label>
+          <select id="network-selector" class="control-select">
+            <option value="filecoin-calibration">Filecoin Calibration</option>
+            <option value="sepolia">Sepolia</option>
           </select>
         </div>
-        <div>
-          <label style="color: white; font-weight: 600; margin-right: 12px; font-size: 1.1rem"
-            >Token:</label
-          >
-          <select
-            id="token-selector"
-            style="
-              padding: 10px 20px;
-              border-radius: 10px;
-              border: 2px solid white;
-              font-weight: 600;
-              font-size: 1rem;
-              background: white;
-              color: #5162FF;
-              cursor: pointer;
-            "
-          >
-            <option value="">All Available</option>
-            <option value="JPYC">JPYC 💴</option>
-            <option value="USDFC">USDFC 💰</option>
+        <div class="control-group">
+          <label>Token:</label>
+          <select id="token-selector" class="control-select">
+            <option value="USDFC">USDFC</option>
           </select>
         </div>
       </div>
 
-      <!-- Wallet connection -->
-      <div
-        style="
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 30px;
-        "
-      >
-        <div>
-          <span id="network-status" style="color: white; font-weight: 600">⛓ Not connected</span>
-        </div>
-        <button
-          id="connect-wallet"
-          style="
-            padding: 10px 18px;
-            border-radius: 10px;
-            border: none;
-            background: white;
-            color: #5162FF;
-            font-weight: 600;
-            cursor: pointer;
-          "
-        >
-          🔌 Connect Wallet
-        </button>
+      <!-- Wallet Connection -->
+      <div class="wallet-section">
+        <span id="network-status" class="network-status">Not connected</span>
+        <button id="connect-wallet" class="connect-btn">Connect Wallet</button>
       </div>
 
-      <div id="catalog" class="products-grid"></div>
+      <!-- Tab Navigation -->
+      <div class="tabs-nav">
+        <button class="tab-btn active" data-tab="cart">Shopping Cart</button>
+        <button class="tab-btn" data-tab="ppv">Pay-Per-View</button>
+        <button class="tab-btn" data-tab="api">API Calls</button>
+      </div>
 
-      <div class="cart-summary">
-        <div class="total-section">
-          <div>
-            <span class="total-label">Total</span>
-            <div style="font-size: 0.95rem; color: #718096">
-              Pay in: <b id="pay-token">USDFC 💰</b>
+      <!-- Tab: Shopping Cart -->
+      <div id="tab-cart" class="tab-panel active">
+        <div id="catalog" class="products-grid"></div>
+        <div class="cart-summary">
+          <div class="total-section">
+            <div>
+              <span class="total-label">Total</span>
+              <div style="font-size: 0.95rem; color: #718096">Pay in: <b id="pay-token">USDFC</b></div>
+            </div>
+            <span class="total-amount" id="total">0.00</span>
+          </div>
+          <button id="checkout" class="checkout-btn" disabled>Secure Checkout</button>
+        </div>
+      </div>
+
+      <!-- Tab: Pay-Per-View -->
+      <div id="tab-ppv" class="tab-panel">
+        <div class="ppv-grid">
+          <!-- Song Content -->
+          <div class="ppv-card" id="ppv-song">
+            <div class="ppv-preview" id="ppv-song-preview">
+              <span class="ppv-lock-icon">🔒</span>
+            </div>
+            <div class="ppv-content">
+              <div class="ppv-title">Argy & Omnya - Aria</div>
+              <div class="ppv-desc">Progressive house track. Unlock to listen.</div>
+              <div class="ppv-price" id="ppv-song-price">0.10 USDFC</div>
+              <button class="ppv-unlock-btn" id="ppv-song-btn" disabled>Unlock Song</button>
             </div>
           </div>
-          <span class="total-amount" id="total">$0.00</span>
+          <!-- Video Content -->
+          <div class="ppv-card" id="ppv-video">
+            <div class="ppv-preview" id="ppv-video-preview">
+              <span class="ppv-lock-icon">🔒</span>
+            </div>
+            <div class="ppv-content">
+              <div class="ppv-title">Exclusive Video</div>
+              <div class="ppv-desc">Premium video content. Pay to watch on YouTube.</div>
+              <div class="ppv-price" id="ppv-video-price">0.25 USDFC</div>
+              <button class="ppv-unlock-btn" id="ppv-video-btn" disabled>Unlock Video</button>
+            </div>
+          </div>
         </div>
-        <button id="checkout" class="checkout-btn" disabled>🔒 Secure Checkout</button>
       </div>
 
-      <!-- Transaction Info (shown after payment) -->
-      <div id="tx-info" class="tx-info" style="display: none">
-        <div class="tx-info-title">Transaction Complete</div>
-        <div class="tx-hash-row">
-          <span class="tx-label">TX Hash:</span>
-          <a id="tx-hash-link" href="#" target="_blank" class="tx-hash">-</a>
+      <!-- Tab: API Calls -->
+      <div id="tab-api" class="tab-panel">
+        <div class="api-section">
+          <div class="api-title">API Endpoint Tester</div>
+          <p style="color: #718096; font-size: 0.9rem; margin-bottom: 16px;">
+            Test free and paid API endpoints. Paid endpoints require x402 payment.
+          </p>
+          <select id="api-endpoint" class="api-endpoint-select">
+            <optgroup label="Free Endpoints">
+              <option value="products">GET /products - Product Catalog</option>
+              <option value="config">GET /api/config - Server Config</option>
+              <option value="weather">GET /weather - Basic Weather</option>
+              <option value="ppv-list">GET /api/ppv - PPV Content List</option>
+            </optgroup>
+            <optgroup label="Paid Endpoints (x402)">
+              <option value="premium-weather">GET /api/premium/weather - $0.01</option>
+              <option value="premium-market">GET /api/premium/market - $0.05</option>
+              <option value="premium-ai">GET /api/premium/ai - $0.10</option>
+            </optgroup>
+          </select>
+          <button id="api-call-btn" class="api-btn">Send Request</button>
+          <div id="api-payment-info" style="display: none; background: rgba(81,98,255,0.1); border: 1px solid rgba(81,98,255,0.3); border-radius: 8px; padding: 12px; margin-bottom: 16px; color: #5162FF; font-size: 0.9rem;"></div>
+          <div class="api-result" id="api-result">// Response will appear here</div>
         </div>
       </div>
     </div>
 
     <script>
+      // ========== CONFIGURATION ==========
       const NETWORKS = {
         "filecoin-calibration": {
           chainId: "0x4cb2f",
@@ -462,10 +546,9 @@
           nativeCurrency: { name: "tFIL", symbol: "tFIL", decimals: 18 },
           rpcUrls: ["https://api.calibration.node.glif.io/rpc/v1"],
           blockExplorerUrls: ["https://calibration.filfox.info/en"],
-          token: "USDFC 💰",
           displayName: "Filecoin Calibration",
           availableTokens: ["USDFC"],
-          exchangeRate: 1, // 1 USD = 1 USDFC
+          exchangeRate: 1,
         },
         sepolia: {
           chainId: "0xaa36a7",
@@ -473,135 +556,154 @@
           nativeCurrency: { name: "ETH", symbol: "ETH", decimals: 18 },
           rpcUrls: ["https://ethereum-sepolia-rpc.publicnode.com"],
           blockExplorerUrls: ["https://sepolia.etherscan.io"],
-          token: "JPYC 💴",
           displayName: "Sepolia",
           availableTokens: ["JPYC"],
-          exchangeRate: 150, // 1 USD = 150 JPYC
+          exchangeRate: 150,
         },
       };
 
-      // Helper function to convert USD price to selected token amount
+      const TOKEN_ADDRESSES = {
+        "filecoin-calibration": { USDFC: "0xb536dCa5ca86bbcAb6544f1b011704E65A0aB833" },
+        sepolia: { JPYC: "0x431D5dfF03120AFA4bDf332c61A6e1766eF37BDB" },
+      };
+
+      const FEE_RECEIVER_ADDRESSES = {
+        "filecoin-calibration": "0x34a6A7D8d7f8C9F2369b7404904DA943C519Ab13",
+        sepolia: "0x0d06F661a4fCB8CF357dCc40b0938eD1f6aC7172",
+      };
+
+      const ERC20_ABI = [
+        "function balanceOf(address owner) view returns (uint256)",
+        "function decimals() view returns (uint8)",
+        "function symbol() view returns (string)",
+      ];
+
+      // ========== STATE ==========
+      let selectedNetwork = "filecoin-calibration";
+      let selectedToken = "USDFC";
+      let userAddress = null;
+      let merchantAddress = null;
+
+      // ========== HELPERS ==========
       function convertPrice(usdPrice, network) {
         const rate = NETWORKS[network].exchangeRate;
         return (usdPrice * rate).toFixed(rate >= 10 ? 0 : 2);
       }
 
-      // Helper function to get token symbol with emoji
       function getTokenDisplay(network) {
         const token = NETWORKS[network].availableTokens[0];
-        const emoji = token === "JPYC" ? "💴" : "💰";
-        return { token, emoji };
+        return token;
       }
 
-      let selectedNetwork = "filecoin-calibration";
-      let selectedToken = ""; // Empty means "all available tokens"
-      let userAddress = null;
-
-      // Toast notification system
-      let toastIdCounter = 0;
-
-      function showToast({
-        type = "info",
-        title,
-        message,
-        link,
-        linkText,
-        retryFn,
-        duration = null,
-        id = null,
-      }) {
-        const toastId = id || `toast-${toastIdCounter++}`;
-        const container = document.getElementById("toast-container");
-
-        // Remove existing toast with same ID
-        const existing = document.getElementById(toastId);
-        if (existing) {
-          existing.remove();
-        }
-
-        const icons = {
-          info: "📋",
-          success: "✅",
-          error: "❌",
-          warning: "⚠️",
-          pending: '<span class="spinner"></span>',
-        };
-
-        const toast = document.createElement("div");
-        toast.className = "toast";
-        toast.id = toastId;
-
-        toast.innerHTML = `
-          <div class="toast-icon">${icons[type] || icons.info}</div>
-          <div class="toast-content">
-            <div class="toast-title">${title}</div>
-            <div class="toast-message">${message}</div>
-            ${link ? `<a href="${link}" target="_blank" class="toast-link">${linkText || "View Transaction"}</a>` : ""}
-            ${retryFn ? '<button class="toast-retry-btn">Retry Payment</button>' : ""}
-          </div>
-          <button class="toast-close">×</button>
-        `;
-
-        container.appendChild(toast);
-
-        // Close button handler
-        toast.querySelector(".toast-close").addEventListener("click", () => {
-          removeToast(toastId);
-        });
-
-        // Retry button handler
-        if (retryFn) {
-          toast.querySelector(".toast-retry-btn").addEventListener("click", () => {
-            removeToast(toastId);
-            retryFn();
-          });
-        }
-
-        // Auto-remove after duration (if specified)
-        if (duration) {
-          setTimeout(() => removeToast(toastId), duration);
-        }
-
-        return toastId;
+      function shortAddr(a) {
+        return a ? `${a.slice(0, 6)}...${a.slice(-4)}` : "";
       }
 
-      function removeToast(toastId) {
-        const toast = document.getElementById(toastId);
-        if (toast) {
-          toast.classList.add("removing");
-          setTimeout(() => toast.remove(), 300);
+      function formatBalance(balance, decimals = 18) {
+        if (!balance || !window.ethers) return "0";
+        const formatted = window.ethers.utils.formatUnits(balance, decimals);
+        return parseFloat(formatted).toFixed(2);
+      }
+
+      // ========== BALANCE FETCHING ==========
+      async function fetchBalance(address, tokenAddress) {
+        try {
+          if (!window.ethers) return null;
+
+          // Use connected wallet provider if available, otherwise public RPC
+          let provider;
+          if (window.ethereum && userAddress) {
+            provider = new window.ethers.providers.Web3Provider(window.ethereum);
+          } else {
+            const rpcUrl = NETWORKS[selectedNetwork].rpcUrls[0];
+            provider = new window.ethers.providers.JsonRpcProvider(rpcUrl);
+          }
+
+          const contract = new window.ethers.Contract(tokenAddress, ERC20_ABI, provider);
+          const [balance, decimals, symbol] = await Promise.all([
+            contract.balanceOf(address),
+            contract.decimals(),
+            contract.symbol(),
+          ]);
+          return { balance, decimals, symbol };
+        } catch (error) {
+          console.error("Error fetching balance for", address, ":", error.message || error);
+          return null;
         }
       }
 
-      function updateToast(toastId, options) {
-        removeToast(toastId);
-        return showToast({ ...options, id: toastId });
+      async function refreshDebugBalances() {
+        const token = getTokenDisplay(selectedNetwork);
+        const tokenAddress = TOKEN_ADDRESSES[selectedNetwork]?.[token];
+        const feeReceiver = FEE_RECEIVER_ADDRESSES[selectedNetwork];
+
+        console.log("[Debug] Refreshing balances for network:", selectedNetwork, "token:", token);
+
+        document.getElementById("debug-fee-addr").textContent = feeReceiver ? shortAddr(feeReceiver) : "N/A";
+
+        if (!tokenAddress) {
+          console.log("[Debug] No token address for", selectedNetwork, token);
+          return;
+        }
+
+        // Fetch all balances in parallel
+        const balancePromises = [];
+
+        if (merchantAddress) {
+          document.getElementById("debug-merchant-addr").textContent = shortAddr(merchantAddress);
+          document.getElementById("debug-merchant-bal").textContent = "Loading...";
+          balancePromises.push(
+            fetchBalance(merchantAddress, tokenAddress).then(bal => {
+              document.getElementById("debug-merchant-bal").textContent = bal
+                ? `${formatBalance(bal.balance, bal.decimals)} ${bal.symbol}`
+                : "- -";
+            })
+          );
+        }
+
+        if (feeReceiver) {
+          document.getElementById("debug-fee-bal").textContent = "Loading...";
+          balancePromises.push(
+            fetchBalance(feeReceiver, tokenAddress).then(bal => {
+              document.getElementById("debug-fee-bal").textContent = bal
+                ? `${formatBalance(bal.balance, bal.decimals)} ${bal.symbol}`
+                : "- -";
+            })
+          );
+        }
+
+        if (userAddress) {
+          document.getElementById("debug-my-addr").textContent = shortAddr(userAddress);
+          document.getElementById("debug-my-bal").textContent = "Loading...";
+          balancePromises.push(
+            fetchBalance(userAddress, tokenAddress).then(bal => {
+              document.getElementById("debug-my-bal").textContent = bal
+                ? `${formatBalance(bal.balance, bal.decimals)} ${bal.symbol}`
+                : "- -";
+              console.log("[Debug] User balance:", bal);
+            })
+          );
+        } else {
+          document.getElementById("debug-my-addr").textContent = "Connect wallet";
+          document.getElementById("debug-my-bal").textContent = "- -";
+        }
+
+        await Promise.all(balancePromises);
       }
 
-      function updateTokenSelector() {
-        const tokenSelector = document.getElementById("token-selector");
-        const network = NETWORKS[selectedNetwork];
-        const availableTokens = network.availableTokens || [];
-
-        // Clear existing options
-        tokenSelector.innerHTML = "";
-
-        // Add available tokens for the selected network
-        availableTokens.forEach(token => {
-          const option = document.createElement("option");
-          option.value = token;
-          const emoji = token === "JPYC" ? "💴" : "💰";
-          option.textContent = `${token} ${emoji}`;
-          tokenSelector.appendChild(option);
-        });
-
-        // Set the first token as selected
-        if (availableTokens.length > 0) {
-          selectedToken = availableTokens[0];
-          tokenSelector.value = selectedToken;
+      async function fetchMerchantAddress() {
+        try {
+          const res = await fetch("/api/config");
+          const data = await res.json();
+          merchantAddress = data.merchantAddress;
+          document.getElementById("debug-merchant-addr").textContent = shortAddr(merchantAddress);
+          refreshDebugBalances();
+        } catch (error) {
+          console.error("Error fetching merchant address:", error);
         }
       }
 
+      // ========== WALLET ==========
       async function ensureCorrectChain() {
         const network = NETWORKS[selectedNetwork];
         if (!window.ethereum) throw new Error("MetaMask not detected");
@@ -627,10 +729,8 @@
         userAddress = accounts[0];
         await ensureCorrectChain();
         updateWalletUI();
-      }
-
-      function shortAddr(a) {
-        return a ? `${a.slice(0, 6)}...${a.slice(-4)}` : "";
+        refreshDebugBalances();
+        updatePPVButtons();
       }
 
       function updateWalletUI() {
@@ -641,118 +741,231 @@
           connectBtn.textContent = shortAddr(userAddress);
           connectBtn.style.background = "#5162FF";
           connectBtn.style.color = "white";
-          netStatus.textContent = `🌐 ${network.displayName}`;
+          netStatus.textContent = `${network.displayName}`;
           netStatus.style.color = "#C6F6D5";
         }
       }
 
-      async function fetchProducts() {
-        const res = await fetch("/products");
-        return await res.json();
+      // ========== TABS ==========
+      function initTabs() {
+        document.querySelectorAll(".tab-btn").forEach(btn => {
+          btn.addEventListener("click", () => {
+            document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+            document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
+            btn.classList.add("active");
+            document.getElementById(`tab-${btn.dataset.tab}`).classList.add("active");
+          });
+        });
       }
 
-      (async function init() {
-        const data = await fetchProducts();
+      // ========== SHOPPING CART ==========
+      let cartProducts = [];
+      let cartState = [];
+
+      async function initCart() {
+        const res = await fetch("/products");
+        const data = await res.json();
+        cartProducts = data.products;
+        cartState = cartProducts.map(p => ({ ...p, qty: 0 }));
+        renderCart();
+      }
+
+      function renderCart() {
         const catalog = document.getElementById("catalog");
         const totalEl = document.getElementById("total");
         const checkoutBtn = document.getElementById("checkout");
-        const connectBtn = document.getElementById("connect-wallet");
-        const networkSelector = document.getElementById("network-selector");
-        const tokenSelector = document.getElementById("token-selector");
         const payTokenEl = document.getElementById("pay-token");
+        const token = getTokenDisplay(selectedNetwork);
 
-        connectBtn.addEventListener("click", connectWallet);
+        catalog.innerHTML = "";
+        cartState.forEach((s, idx) => {
+          const div = document.createElement("div");
+          div.className = "product-card";
+          const convertedPrice = convertPrice(s.priceUSD, selectedNetwork);
+          const lineTotal = convertPrice(s.qty * s.priceUSD, selectedNetwork);
 
-        networkSelector.addEventListener("change", e => {
-          selectedNetwork = e.target.value;
-          updateTokenSelector();
-          const { token, emoji } = getTokenDisplay(selectedNetwork);
-          payTokenEl.textContent = `${token} ${emoji}`;
-          updateWalletUI();
-          render();
+          div.innerHTML = `
+            <div class="product-icon">${["🎨", "👕", "☕"][idx] || "📦"}</div>
+            <div class="product-name">${s.name}</div>
+            <div class="product-price">${convertedPrice} ${token}</div>
+            <div class="qty-control">
+              <button class="qty-btn" data-idx="${idx}" data-action="dec">−</button>
+              <input class="qty-input" type="number" value="${s.qty}" readonly />
+              <button class="qty-btn" data-idx="${idx}" data-action="inc">+</button>
+            </div>
+            <div class="line-total">${lineTotal} ${token}</div>`;
+          catalog.appendChild(div);
         });
 
-        tokenSelector.addEventListener("change", e => {
-          selectedToken = e.target.value;
-          // Update display if specific token selected
-          if (selectedToken) {
-            const emoji = selectedToken === "JPYC" ? "💴" : "💰";
-            payTokenEl.textContent = `${selectedToken} ${emoji}`;
-          }
-        });
+        const totalUSD = cartState.reduce((acc, s) => acc + s.qty * s.priceUSD, 0);
+        const convertedTotal = convertPrice(totalUSD, selectedNetwork);
+        totalEl.textContent = `${convertedTotal} ${token}`;
+        payTokenEl.textContent = token;
+        checkoutBtn.disabled = totalUSD <= 0 || !userAddress;
+      }
 
-        // Initialize token selector based on default network
-        updateTokenSelector();
-        const { token: initToken, emoji: initEmoji } = getTokenDisplay(selectedNetwork);
-        payTokenEl.textContent = `${initToken} ${initEmoji}`;
-
-        const products = data.products;
-        const state = products.map(p => ({ ...p, qty: 0 }));
-
-        function render() {
-          catalog.innerHTML = "";
-          const { token, emoji } = getTokenDisplay(selectedNetwork);
-
-          state.forEach((s, idx) => {
-            const div = document.createElement("div");
-            div.className = "product-card";
-            const convertedPrice = convertPrice(s.priceUSD, selectedNetwork);
-            const lineTotal = convertPrice(s.qty * s.priceUSD, selectedNetwork);
-
-            div.innerHTML = `
-              <div class="product-icon">${["🎨", "👕", "☕"][idx] || "📦"}</div>
-              <div class="product-name">${s.name}</div>
-              <div class="product-price">${convertedPrice} ${token} ${emoji}</div>
-              <div class="qty-control">
-                <button class="qty-btn" data-idx="${idx}" data-action="dec">−</button>
-                <input class="qty-input" type="number" value="${s.qty}" readonly />
-                <button class="qty-btn" data-idx="${idx}" data-action="inc">+</button>
-              </div>
-              <div class="line-total">${lineTotal} ${token} ${emoji}</div>`;
-            catalog.appendChild(div);
-          });
-
-          const totalUSD = state.reduce((acc, s) => acc + s.qty * s.priceUSD, 0);
-          const convertedTotal = convertPrice(totalUSD, selectedNetwork);
-          totalEl.textContent = `${convertedTotal} ${token} ${emoji}`;
-          checkoutBtn.disabled = totalUSD <= 0 || !userAddress;
-        }
-
-        catalog.addEventListener("click", e => {
+      function initCartEvents() {
+        document.getElementById("catalog").addEventListener("click", e => {
           const btn = e.target.closest(".qty-btn");
           if (!btn) return;
-          const idx = Number(btn.getAttribute("data-idx"));
-          const action = btn.getAttribute("data-action");
-          if (action === "inc") state[idx].qty++;
-          else if (action === "dec" && state[idx].qty > 0) state[idx].qty--;
-          render();
+          const idx = Number(btn.dataset.idx);
+          const action = btn.dataset.action;
+          if (action === "inc") cartState[idx].qty++;
+          else if (action === "dec" && cartState[idx].qty > 0) cartState[idx].qty--;
+          renderCart();
         });
 
-        checkoutBtn.addEventListener("click", async () => {
-          try {
-            checkoutBtn.disabled = true;
-            checkoutBtn.textContent = "Processing...";
+        document.getElementById("checkout").addEventListener("click", () => {
+          const items = cartState.filter(s => s.qty > 0);
+          let url = `/checkout-page?items=${encodeURIComponent(JSON.stringify(items))}&network=${selectedNetwork}`;
+          if (selectedToken) url += `&token=${selectedToken}`;
+          window.location.href = url;
+        });
+      }
 
-            const items = state.filter(s => s.qty > 0);
+      // ========== PAY-PER-VIEW ==========
+      const PPV_CONTENT = {
+        song: { id: "song", priceUSD: 0.10 },
+        video: { id: "video", priceUSD: 0.25 },
+      };
 
-            // Build checkout URL
-            let url = `/checkout-page?items=${encodeURIComponent(JSON.stringify(items))}&network=${selectedNetwork}`;
-            if (selectedToken) {
-              url += `&token=${selectedToken}`;
-            }
+      function updatePPVPrices() {
+        const token = getTokenDisplay(selectedNetwork);
+        document.getElementById("ppv-song-price").textContent =
+          `${convertPrice(PPV_CONTENT.song.priceUSD, selectedNetwork)} ${token}`;
+        document.getElementById("ppv-video-price").textContent =
+          `${convertPrice(PPV_CONTENT.video.priceUSD, selectedNetwork)} ${token}`;
+      }
 
-            // Traditional blocking flow - let x402 middleware handle the payment
-            window.location.href = url;
-          } catch (err) {
-            console.error("Checkout error:", err);
-            alert("Error: " + err.message);
-          } finally {
-            checkoutBtn.disabled = false;
-            checkoutBtn.textContent = "🔒 Secure Checkout";
+      function updatePPVButtons() {
+        document.getElementById("ppv-song-btn").disabled = !userAddress;
+        document.getElementById("ppv-video-btn").disabled = !userAddress;
+      }
+
+      function initPPVEvents() {
+        document.getElementById("ppv-song-btn").addEventListener("click", () => {
+          const price = PPV_CONTENT.song.priceUSD;
+          window.location.href = `/ppv/song?network=${selectedNetwork}&token=${selectedToken}&price=${price}`;
+        });
+
+        document.getElementById("ppv-video-btn").addEventListener("click", () => {
+          const price = PPV_CONTENT.video.priceUSD;
+          window.location.href = `/ppv/video?network=${selectedNetwork}&token=${selectedToken}&price=${price}`;
+        });
+      }
+
+      // ========== API TESTER ==========
+      const API_ENDPOINTS = {
+        // Free endpoints
+        products: { url: "/products", paid: false },
+        config: { url: "/api/config", paid: false },
+        weather: { url: "/weather", paid: false },
+        "ppv-list": { url: "/api/ppv", paid: false },
+        // Paid endpoints
+        "premium-weather": { url: "/api/premium/weather", paid: true, price: 0.01 },
+        "premium-market": { url: "/api/premium/market", paid: true, price: 0.05 },
+        "premium-ai": { url: "/api/premium/ai", paid: true, price: 0.10 },
+      };
+
+      function initAPITester() {
+        const paymentInfo = document.getElementById("api-payment-info");
+
+        // Show payment info when selecting paid endpoint
+        document.getElementById("api-endpoint").addEventListener("change", (e) => {
+          const ep = API_ENDPOINTS[e.target.value];
+          if (ep && ep.paid) {
+            const token = getTokenDisplay(selectedNetwork);
+            const price = convertPrice(ep.price, selectedNetwork);
+            paymentInfo.innerHTML = `This endpoint requires payment: <strong>${price} ${token}</strong> per call`;
+            paymentInfo.style.display = "block";
+          } else {
+            paymentInfo.style.display = "none";
           }
         });
 
-        render();
+        document.getElementById("api-call-btn").addEventListener("click", async () => {
+          const endpointKey = document.getElementById("api-endpoint").value;
+          const resultEl = document.getElementById("api-result");
+          const btn = document.getElementById("api-call-btn");
+          const ep = API_ENDPOINTS[endpointKey];
+
+          if (!ep) return;
+
+          // For paid endpoints, redirect to trigger x402 flow
+          if (ep.paid) {
+            if (!userAddress) {
+              resultEl.textContent = "// Error: Please connect your wallet first to access paid endpoints";
+              return;
+            }
+            // Redirect to paid endpoint - x402 will handle payment
+            window.location.href = `${ep.url}?network=${selectedNetwork}&token=${selectedToken}`;
+            return;
+          }
+
+          btn.disabled = true;
+          btn.textContent = "Loading...";
+          resultEl.textContent = "// Fetching...";
+
+          try {
+            const res = await fetch(ep.url);
+            const data = await res.json();
+            resultEl.textContent = JSON.stringify(data, null, 2);
+          } catch (err) {
+            resultEl.textContent = `// Error: ${err.message}`;
+          } finally {
+            btn.disabled = false;
+            btn.textContent = "Send Request";
+          }
+        });
+      }
+
+      // ========== TOKEN SELECTOR ==========
+      function updateTokenSelector() {
+        const tokenSelector = document.getElementById("token-selector");
+        const network = NETWORKS[selectedNetwork];
+        const availableTokens = network.availableTokens || [];
+
+        tokenSelector.innerHTML = "";
+        availableTokens.forEach(token => {
+          const option = document.createElement("option");
+          option.value = token;
+          option.textContent = token;
+          tokenSelector.appendChild(option);
+        });
+
+        if (availableTokens.length > 0) {
+          selectedToken = availableTokens[0];
+          tokenSelector.value = selectedToken;
+        }
+      }
+
+      // ========== INIT ==========
+      (async function init() {
+        initTabs();
+
+        document.getElementById("connect-wallet").addEventListener("click", connectWallet);
+
+        document.getElementById("network-selector").addEventListener("change", e => {
+          selectedNetwork = e.target.value;
+          updateTokenSelector();
+          updateWalletUI();
+          renderCart();
+          updatePPVPrices();
+          refreshDebugBalances();
+        });
+
+        document.getElementById("token-selector").addEventListener("change", e => {
+          selectedToken = e.target.value;
+        });
+
+        updateTokenSelector();
+        await initCart();
+        initCartEvents();
+        initPPVEvents();
+        initAPITester();
+        updatePPVPrices();
+        fetchMerchantAddress();
+
       })();
     </script>
   </body>

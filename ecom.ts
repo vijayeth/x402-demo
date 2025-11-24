@@ -2,8 +2,32 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { config } from "dotenv";
 import express from "express";
+import fs from "fs";
 import path from "path";
 import { Network, paymentMiddleware, Resource } from "@secured-finance/sf-x402-express";
+
+// Load PPV success template
+const PPV_SUCCESS_TEMPLATE = fs.readFileSync(
+  path.join(process.cwd(), "public/templates/ppv-success.html"),
+  "utf-8"
+);
+
+function renderPPVSuccess(data: {
+  contentName: string;
+  embedHtml: string;
+  txHash: string;
+  explorerUrl: string;
+  shortTxHash: string;
+}): string {
+  const txDisplay = data.txHash
+    ? `<a href="${data.explorerUrl}" target="_blank" title="${data.txHash}">${data.shortTxHash}</a>`
+    : `<span style="opacity: 0.6">Settlement pending...</span>`;
+
+  return PPV_SUCCESS_TEMPLATE
+    .replace("{{CONTENT_NAME}}", data.contentName)
+    .replace("{{EMBED_HTML}}", data.embedHtml)
+    .replace("{{TX_DISPLAY}}", txDisplay);
+}
 
 config();
 
@@ -570,6 +594,136 @@ app.get("/order/:orderId", async (req, res) => {
   `);
 });
 
+// ========== PAY-PER-VIEW CONTENT ==========
+const PPV_CONTENT = [
+  {
+    id: "song",
+    name: "Argy & Omnya - Aria",
+    priceUSD: 0.1,
+    type: "song",
+    url: "https://soundcloud.com/obsessiveprogressive/argy-omnya-aria",
+  },
+  {
+    id: "video",
+    name: "Exclusive Video",
+    priceUSD: 0.25,
+    type: "video",
+    url: "https://youtu.be/D1y64Hy-_VI",
+  },
+];
+
+/**
+ * GET /api/ppv - List available PPV content
+ */
+app.get("/api/ppv", (_req, res) => {
+  res.json({ content: PPV_CONTENT });
+});
+
+/**
+ * GET /ppv/:contentId - Pay to unlock content
+ * Protected by x402 paymentMiddleware
+ */
+app.get(
+  "/ppv/:contentId",
+  (req, res, next) => {
+    const { contentId } = req.params;
+    const content = PPV_CONTENT.find(c => c.id === contentId);
+
+    if (!content) {
+      return res.status(404).send("Content not found");
+    }
+
+    const selectedNetwork = (req.query.network as string) || NETWORK;
+    const selectedToken = req.query.token as string;
+
+    // Apply x402 middleware with content price
+    const middleware = paymentMiddleware(
+      PAY_TO,
+      {
+        [`GET /ppv/${contentId}`]: {
+          price: `$${content.priceUSD}`,
+          network: selectedNetwork as any,
+          ...(selectedToken && { token: selectedToken as any }),
+        },
+      },
+      { url: FACILITATOR_URL },
+    );
+
+    middleware(req, res, next);
+  },
+  async (req, res) => {
+    const { contentId } = req.params;
+    const content = PPV_CONTENT.find(c => c.id === contentId) as any;
+    const contentName = content?.name || contentId;
+    const selectedNetwork = (req.query.network as string) || NETWORK;
+
+    // Wait for txHash from middleware headers (settlement happens async)
+    let txHash = "";
+    let explorerUrl = "";
+    for (let i = 0; i < 120; i++) {  // 120 * 500ms = 60 seconds max
+      await new Promise(r => setTimeout(r, 500));
+
+      // Check header directly - middleware sets this when settlement completes
+      txHash = (res.getHeader("X-PAYMENT-TX-HASH") as string) || "";
+      explorerUrl = (res.getHeader("X-PAYMENT-TX-EXPLORER") as string) || "";
+
+      if (txHash) {
+        console.log(`[PPV] Got txHash from header after ${(i + 1) * 500}ms`);
+        break;
+      }
+    }
+    const shortTxHash = txHash ? `${txHash.slice(0, 10)}...${txHash.slice(-8)}` : "Pending...";
+    if (!explorerUrl && txHash) {
+      explorerUrl = selectedNetwork === "sepolia"
+        ? `https://sepolia.etherscan.io/tx/${txHash}`
+        : `https://calibration.filfox.info/en/message/${txHash}`;
+    }
+
+    // Generate embed based on content type
+    let embedHtml = "";
+    if (content?.type === "song") {
+      // SoundCloud embed - extract track URL for widget
+      embedHtml = `
+        <iframe
+          width="100%"
+          height="166"
+          scrolling="no"
+          frameborder="no"
+          allow="autoplay"
+          src="https://w.soundcloud.com/player/?url=${encodeURIComponent(content.url)}&color=%235162FF&auto_play=true&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=false">
+        </iframe>`;
+    } else if (content?.type === "video") {
+      // YouTube embed - extract video ID (handles youtube.com/watch?v= and youtu.be/ formats)
+      let videoId = "";
+      if (content.url.includes("watch?v=")) {
+        videoId = content.url.split("watch?v=")[1].split("&")[0];
+      } else if (content.url.includes("youtu.be/")) {
+        videoId = content.url.split("youtu.be/")[1].split("?")[0];
+      } else {
+        videoId = content.url.split("/").pop() || "";
+      }
+      embedHtml = `
+        <iframe
+          width="100%"
+          height="315"
+          src="https://www.youtube.com/embed/${videoId}?autoplay=1"
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen>
+        </iframe>`;
+    }
+
+    // Payment successful - render success page with embedded media
+    res.send(renderPPVSuccess({
+      contentName,
+      embedHtml,
+      txHash,
+      explorerUrl,
+      shortTxHash,
+    }));
+  },
+);
+
 /**
  * Example free resource
  */
@@ -582,7 +736,89 @@ app.get("/weather", (_req, res) => {
   });
 });
 
-// // For local development
+// ========== PAID API ENDPOINTS ==========
+
+// Helper to create dynamic payment middleware for API endpoints
+function createPaidApiRoute(
+  path: string,
+  price: string,
+  handler: (req: express.Request, res: express.Response) => void
+) {
+  app.get(
+    path,
+    (req, res, next) => {
+      const selectedNetwork = (req.query.network as string) || NETWORK;
+      const selectedToken = req.query.token as string;
+
+      const middleware = paymentMiddleware(
+        PAY_TO,
+        {
+          [`GET ${path}`]: {
+            price,
+            network: selectedNetwork as any,
+            ...(selectedToken && { token: selectedToken as any }),
+          },
+        },
+        { url: FACILITATOR_URL }
+      );
+
+      middleware(req, res, next);
+    },
+    handler
+  );
+}
+
+// GET /api/premium/weather - Detailed weather data ($0.01)
+createPaidApiRoute("/api/premium/weather", "$0.01", (_req, res) => {
+  res.json({
+    premium: true,
+    location: "San Francisco, CA",
+    current: {
+      temperature: 72,
+      humidity: 65,
+      windSpeed: 12,
+      conditions: "Partly Cloudy",
+      uvIndex: 6,
+    },
+    forecast: [
+      { day: "Today", high: 75, low: 58, conditions: "Sunny" },
+      { day: "Tomorrow", high: 72, low: 55, conditions: "Cloudy" },
+      { day: "Wednesday", high: 68, low: 52, conditions: "Rain" },
+    ],
+    alerts: [],
+    lastUpdated: new Date().toISOString(),
+  });
+});
+
+// GET /api/premium/market - Market data ($0.05)
+createPaidApiRoute("/api/premium/market", "$0.05", (_req, res) => {
+  res.json({
+    premium: true,
+    timestamp: new Date().toISOString(),
+    assets: [
+      { symbol: "BTC", price: 97500.42, change24h: 2.3 },
+      { symbol: "ETH", price: 3420.18, change24h: -1.2 },
+      { symbol: "FIL", price: 5.82, change24h: 4.7 },
+    ],
+    marketCap: "3.2T",
+    volume24h: "142B",
+  });
+});
+
+// GET /api/premium/ai - AI-generated content ($0.10)
+createPaidApiRoute("/api/premium/ai", "$0.10", (req, res) => {
+  const prompt = req.query.prompt || "Hello";
+  res.json({
+    premium: true,
+    prompt,
+    response: `AI Response to "${prompt}": This is a simulated AI response. In a real implementation, this would call an actual AI model. The x402 protocol enables pay-per-call API monetization!`,
+    model: "gpt-4-simulated",
+    tokens: 42,
+    timestamp: new Date().toISOString(),
+  });
+});
+
+// For local development
 // app.listen(PORT, () => {
 //   console.log(`\n🛒 x402 Demo Shop (LIVE Payments)`);
 //   console.log(`Server: http://localhost:${PORT}`);
