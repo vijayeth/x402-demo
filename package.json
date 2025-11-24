@@ -1,6 +1,7 @@
 {
   "name": "ecom-standalone-demo",
   "version": "1.0.0",
+  "type": "module",
   "private": true,
   "description": "Standalone ecommerce demo using published x402 packages",
   "scripts": {
